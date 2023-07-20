@@ -1,4 +1,4 @@
-# An archiver tool for your webuntis messenger chats
+# An archiver tool for your webuntis messenger chats before the servers get taken down
 
 To archive chats, run main.py
 If you also want to archive any files, run download_files.py after running main.py
