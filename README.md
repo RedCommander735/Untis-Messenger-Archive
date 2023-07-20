@@ -1,0 +1,12 @@
+# An archiver tool for your webuntis messenger chats
+
+To archive chats, run main.py
+If you also want to archive any files, run download_files.py after running main.py
+
+## TODO
+-
+- [x] Loop over every chat
+- [x] Download files and add references to json
+- [x] Save data as JSON object (each chat --> messages, message --> (Time, author, profile pic, [file], [msg])); added TODOs everywhere data is to be saved
+- [x] Read username and password from file
+- [ ] Add some kind of interface to view archived chats
