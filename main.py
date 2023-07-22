@@ -6,6 +6,8 @@ import datetime
 import json
 import sys
 
+DATE = 'c01362'
+TEXT = 'c01364'
 
 
 def scrollUpChat(driver):
@@ -72,13 +74,13 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
 
 
         # if "c01362" in messageElement.get_attribute("class"):
-        if "c01360" in messageElement.get_attribute("class"):
+        if DATE in messageElement.get_attribute("class"):
             date = messageElement.find_element(By.TAG_NAME, "span").get_attribute('innerHTML').replace('Heute, ', '').replace('Gestern, ', '').replace(' Jan. ', '01.').replace(' Feb. ', '02.').replace(' März ', '03.').replace(' Apr. ', '04.').replace(' Mai ', '05.').replace(' Juni ', '06.').replace(' Juli ', '07.').replace(' Aug. ', '08.').replace(' Sept. ', '09.').replace(' Okt. ', '10.').replace(' Nov. ', '11.').replace(' Dez. ', '12.')
 
             print("\n\n" + date + ":\n")
 
         # elif "c01364" in messageElement.get_attribute("class"):
-        elif "c01362" in messageElement.get_attribute("class"):
+        elif TEXT in messageElement.get_attribute("class"):
 
             try:
                 author = messageElement.find_element(By.CSS_SELECTOR, "header > span").get_attribute('innerHTML')
@@ -183,7 +185,7 @@ for chat in chats:
 
     scrollTopOld = driver.execute_script("try {return document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTop} catch (error) {return 0}")
 
-    messageElements = driver.find_elements(By.CSS_SELECTOR, ".c01360, .c01362")
+    messageElements = driver.find_elements(By.CSS_SELECTOR, f".{DATE}, .{TEXT}")
         
     date, last_author, last_time, messages = printMsg(messageElements, count)
 
@@ -193,10 +195,10 @@ for chat in chats:
             height = last_element.value_of_css_property('height').replace('px', '')
             top = last_element.value_of_css_property('top').replace('px', '')
 
-            currentScroll = float(height) + int(top) + 145
+            currentScroll = float(height) + int(top) + 150
             
 
-            driver.execute_script("try {document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTo({top: " + str(currentScroll) + " , left: 0})} catch (error) {}")
+            driver.execute_script("try {document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTop = " + str(currentScroll) + "} catch (error) {}")
 
             scrollTopNew = driver.execute_script("try {return document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTop} catch (error) {return 0}")
 
@@ -205,7 +207,7 @@ for chat in chats:
 
             scrollTopOld = scrollTopNew
 
-            messageElements = driver.find_elements(By.CSS_SELECTOR, ".c01360, .c01362")
+            messageElements = driver.find_elements(By.CSS_SELECTOR, f".{DATE}, .{TEXT}")
             
             date, last_author, last_time, _messages = printMsg(messageElements, count, date, last_author, last_time)
 
