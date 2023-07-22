@@ -8,7 +8,6 @@ If you also want to archive any files, run download_files.py after running main.
 Run migrate format if you've done your file downloading with v1
 
 ## TODO
--
 - [x] Loop over every chat
 - [x] Download files and add references to json
 - [x] Save data as JSON object (each chat --> messages, message --> (Time, author, profile pic, [file], [msg])); added TODOs everywhere data is to be saved
