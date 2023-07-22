@@ -1,0 +1,49 @@
+:root {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+#app {
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    overflow: hidden;
+    white-space: normal;
+}
+
+#chats {
+    min-width: 250px;
+    max-width: 250px;
+    height: 100vh;
+    border-right: 1px solid black;
+    overflow-y: scroll;
+}
+
+#messages {
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    height: 100vh;
+}
+
+.message {
+    font-size: 14px;
+}
+
+.chat_container {
+    font-size: 14px;
+    padding: 10px 10px 10px 20px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.chat_container:hover {
+    background-color: #cccccc;
+}
+

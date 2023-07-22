@@ -92,7 +92,7 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
                 _time = last_time
                 
             if (messageElement.find_elements(By.TAG_NAME, "p")):
-                _message = messageElement.find_element(By.TAG_NAME, 'p').get_attribute('innerHTML')
+                _message = messageElement.find_element(By.TAG_NAME, 'p').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
 
             if (messageElement.find_elements(By.CSS_SELECTOR, ".c01398 > div > .c01408 a")):
                 link = messageElement.find_element(By.CSS_SELECTOR, '.c01398 > div > .c01408 a').get_attribute('href')

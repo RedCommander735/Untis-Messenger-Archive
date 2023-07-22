@@ -55,7 +55,7 @@ for key in data:
     for message in messages:
         link = message['attached_file']
         if link != '':
-            save_path = download_file(link, './downloads')
+            save_path = download_file(link, 'static/downloads')
             message['storage_path'] = save_path
             message['has_attachment'] = True
             print(f'Saved file at {save_path}')
@@ -64,7 +64,7 @@ for key in data:
             message['storage_path'] = save_path
             message['has_attachment'] = False
 
-with open('data_with_files_v2.json', 'w', indent=4) as file:
-    json.dump(data, file)
+with open('static/data_with_files_v2.json', 'w') as file:
+    json.dump(data, file, indent=4)
 
 print('Done!')

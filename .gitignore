@@ -1,2 +1,3 @@
 *.json
 downloads
+__pycache__
