@@ -57,9 +57,14 @@ for key in data:
         if link != '':
             save_path = download_file(link, './downloads')
             message['storage_path'] = save_path
+            message['has_attachment'] = True
             print(f'Saved file at {save_path}')
+        else:
+            save_path = ''
+            message['storage_path'] = save_path
+            message['has_attachment'] = False
 
-with open('data_with_files.json', 'w') as file:
+with open('data_with_files_v2.json', 'w', indent=4) as file:
     json.dump(data, file)
 
 print('Done!')

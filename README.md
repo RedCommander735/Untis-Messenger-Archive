@@ -1,7 +1,11 @@
 # An archiver tool for your webuntis messenger chats before the servers get taken down
 
+Current format: v2
+
 To archive chats, run main.py
 If you also want to archive any files, run download_files.py after running main.py
+
+Run migrate format if you've done your file downloading with v1
 
 ## TODO
 -
