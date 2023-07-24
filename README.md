@@ -1,6 +1,6 @@
 # An archiver tool for your webuntis messenger chats before the servers get taken down
 
-# DOWNLOADER IS SOMEHOW BROKEN, MESSAGES GET DOUBLED
+## <span style='color: red'>DOWNLOADER IS SOMEHOW BROKEN, MESSAGES GET DOUBLED</span>
 
 Current format: v2
 
@@ -16,4 +16,4 @@ Run migrate format if you've done your file downloading with v1
 - [x] Read username and password from file
 - [x] Add some kind of interface to view archived chats
     - [ ] Add previews for images
-    
+
