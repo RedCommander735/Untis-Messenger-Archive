@@ -24,14 +24,45 @@ body {
 }
 
 #messages {
+    width: 100%;
+}
+
+#msg {
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
     height: 100vh;
 }
 
+.date {
+    display: grid;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    justify-content: center;
+}
+
+.date:not(:nth-child(2n)) > .date_container {
+    border: 1px solid #868686;
+    background-color: #f8f8f8;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+.date:nth-child(2n) > .date_container {
+    border: 1px solid #868686;
+    background-color: #ffffff;
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
 .message {
     font-size: 14px;
+    padding-left: 15px;
+}
+
+.message:nth-child(2n), .date:nth-child(2n) {
+    background-color: #f8f8f8;
 }
 
 .chat_container {
@@ -46,4 +77,3 @@ body {
 .chat_container:hover {
     background-color: #cccccc;
 }
-

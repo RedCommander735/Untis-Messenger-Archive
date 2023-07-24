@@ -46,10 +46,17 @@ function main(chats: HTMLElement, data: Chats, messages: HTMLElement) {
 
         chats.appendChild(chatContainer)
     });
-
+    (chats.querySelector(':first-child') as HTMLElement)!.click()
 }
 
-function loadChat(chat: string, data: Chats, messages: HTMLElement) {
+function loadChat(chat: string, data: Chats, messages_container: HTMLElement) {
+    try {
+        document.querySelector('#msg')!.remove()
+    } catch {}
+    
+
+    const messages = document.createElement('div')
+    messages.id = 'msg' 
     const parser = new DOMParser()
     console.log(chat)
     const currentChat = data[chat]!
@@ -72,13 +79,17 @@ function loadChat(chat: string, data: Chats, messages: HTMLElement) {
         if (has_attachment) {
             const storage_path = message['storage_path']
             const temp = storage_path.split('\\')
+            const body = document.createElement('body')
             const fileName = document.createTextNode(temp[temp.length - 1])
             const messageLink = document.createElement('a')
+            const container = document.createElement('p')
 
             messageLink.setAttribute('href', storage_path)
             messageLink.appendChild(fileName)
             messageLink.classList.add('file')
-            messageText.appendChild(messageLink)
+            container.appendChild(messageLink)
+            body.appendChild(container)
+            messageText.appendChild(body)
         } else {
             const html = parser.parseFromString(message['message'], 'text/html')
             // console.log(html.body)
@@ -91,6 +102,7 @@ function loadChat(chat: string, data: Chats, messages: HTMLElement) {
         
         currentDate = date
     });
+    messages_container.appendChild(messages)
 
     const scrollHeight = messages.scrollHeight
     messages.scrollTo(0, scrollHeight)
@@ -98,11 +110,14 @@ function loadChat(chat: string, data: Chats, messages: HTMLElement) {
 
 function createDateHeader(date: string) {
     const dateHeader = document.createElement('div')
-            const dateText = document.createTextNode(date)
-            dateHeader.classList.add('date')
-            dateHeader.appendChild(dateText)
+    const dateContainer = document.createElement('div')
+    const dateText = document.createTextNode(date)
+    dateContainer.classList.add('date_container')
+    dateContainer.appendChild(dateText)
+    dateHeader.classList.add('date')
+    dateHeader.appendChild(dateContainer)
 
-            return dateHeader
+    return dateHeader
 }
 
 function sleep(milliseconds: number) {

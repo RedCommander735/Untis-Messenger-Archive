@@ -6,9 +6,8 @@ import datetime
 import json
 import sys
 
-DATE = 'c01362'
-TEXT = 'c01364'
-
+from typing import List
+from selenium.webdriver.remote.webelement import WebElement
 
 def scrollUpChat(driver):
     """A method for scrolling the page."""
@@ -62,11 +61,13 @@ def scrollDownChatList(driver):
         last_height = new_height
 
 
-def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null", last_time = "00:00"):
+def printMsg(_messageElements: List[WebElement], count, date = "01.01.2000", last_author = "null", last_time = "00:00"):
 
     messages = []
 
     for messageElement in _messageElements:
+
+        messageElement = messageElement.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
         _time = ""
         author = ""
         link = ""
@@ -74,14 +75,13 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
 
 
         # if "c01362" in messageElement.get_attribute("class"):
-        if DATE in messageElement.get_attribute("class"):
-            date = messageElement.find_element(By.TAG_NAME, "span").get_attribute('innerHTML').replace('Heute, ', '').replace('Gestern, ', '').replace(' Jan. ', '01.').replace(' Feb. ', '02.').replace(' März ', '03.').replace(' Apr. ', '04.').replace(' Mai ', '05.').replace(' Juni ', '06.').replace(' Juli ', '07.').replace(' Aug. ', '08.').replace(' Sept. ', '09.').replace(' Okt. ', '10.').replace(' Nov. ', '11.').replace(' Dez. ', '12.')
+        if messageElement.find_elements(By.CSS_SELECTOR, ':scope > div > span'):
+            date = messageElement.find_element(By.CSS_SELECTOR, ':scope > div > span').get_attribute('innerHTML').replace('Heute, ', '').replace('Gestern, ', '').replace(' Jan. ', '01.').replace(' Feb. ', '02.').replace(' März ', '03.').replace(' Apr. ', '04.').replace(' Mai ', '05.').replace(' Juni ', '06.').replace(' Juli ', '07.').replace(' Aug. ', '08.').replace(' Sept. ', '09.').replace(' Okt. ', '10.').replace(' Nov. ', '11.').replace(' Dez. ', '12.')
 
             print("\n\n" + date + ":\n")
 
         # elif "c01364" in messageElement.get_attribute("class"):
-        elif TEXT in messageElement.get_attribute("class"):
-
+        elif messageElement.find_elements(By.CSS_SELECTOR, "div > span > p:first-child, div > div > a:first-child"):
             try:
                 author = messageElement.find_element(By.CSS_SELECTOR, "header > span").get_attribute('innerHTML')
                 last_author = author
@@ -94,11 +94,11 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
                 _time = last_time
                 
             if (messageElement.find_elements(By.TAG_NAME, "p")):
-                _message = messageElement.find_element(By.TAG_NAME, 'p').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
+                _message = messageElement.find_element(By.TAG_NAME, 'p').find_element(By.XPATH, '..').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
 
             # TODO Broken, fix
-            if (messageElement.find_elements(By.CSS_SELECTOR, ".c01398 > div > .c01408 a")):
-                link = messageElement.find_element(By.CSS_SELECTOR, '.c01398 > div > .c01408 a').get_attribute('href')
+            if (messageElement.find_elements(By.CSS_SELECTOR, "div > div > a")):
+                link = messageElement.find_element(By.CSS_SELECTOR, 'div > div > a').get_attribute('href')
 
 
             datestring = date + ' ' + _time
@@ -107,12 +107,14 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
             
             data = {'unix_time': _date, 'date': date, 'time': _time, 'author': author, 'message': _message, 'attached_file': link}
 
-            messages.append(data)
+            if data not in messages:
+                messages.append(data)
             # TODO Save time, author, message and file for each msg, maybe save profile pics to
 
             print(f'{date}, {_time} - {author}: {_message}, File: {link} \n')
 
     return (date, last_author, last_time, messages)
+
 
 USERNAME = ''
 PASSWORD = ''
@@ -169,6 +171,13 @@ count = 0
 
 all_chat_data = {}
 
+def cleanElements(elements: List[WebElement]):
+    for element in elements:
+        if (element.get_attribute('tagName') == 'A') and (element.find_element(By.XPATH, '../../../../../../..').find_elements(By.CSS_SELECTOR, ':scope > div > div > div > div > span')):
+            elements.remove(element)
+
+    return elements
+
 # TODO Start loop here
 
 for chat in chats:
@@ -186,17 +195,31 @@ for chat in chats:
 
     scrollTopOld = driver.execute_script("try {return document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTop} catch (error) {return 0}")
 
-    messageElements = driver.find_elements(By.CSS_SELECTOR, f".{DATE}, .{TEXT}")
+    messageElements = driver.find_elements(By.CSS_SELECTOR, "div > span > p:first-child, div > div > a:first-child")
+
+    
         
-    date, last_author, last_time, messages = printMsg(messageElements, count)
+    date, last_author, last_time, messages = printMsg(cleanElements(messageElements), count)
 
     while True:
         if (messageElements):
-            last_element = messageElements[-1].find_element(By.XPATH, '..')
+            # for p; for a 3 more .find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
+            last_element = messageElements[-1]
+            if (last_element.get_attribute('tagName') == 'A') and (last_element.find_element(By.XPATH, '../../../../../../../../../..').find_elements(By.CSS_SELECTOR, ':scope > div > button')):
+                last_element = last_element.find_element(By.XPATH, '../../../../../../../../../../../..')
+                print('inline link')
+            elif (last_element.get_attribute('tagName') == 'A') and (last_element.find_element(By.XPATH, '../../../../../../..').find_elements(By.CSS_SELECTOR, ':scope > div > div > div > div > span')):
+                last_element = last_element.find_element(By.XPATH, '../../../../../../../../../../../..')
+                print('embed')
+            else:
+                last_element = last_element.find_element(By.XPATH, '../../../../../../../../..')
+                print('p')
+            
+            print(last_element.get_attribute('outerHTML'))
             height = last_element.value_of_css_property('height').replace('px', '')
             top = last_element.value_of_css_property('top').replace('px', '')
 
-            currentScroll = float(height) + int(top) + 145
+            currentScroll = float(height) + int(top)
             
 
             driver.execute_script("try {document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTop = " + str(currentScroll) + "} catch (error) {}")
@@ -208,12 +231,17 @@ for chat in chats:
 
             scrollTopOld = scrollTopNew
 
-            messageElements = driver.find_elements(By.CSS_SELECTOR, f".{DATE}, .{TEXT}")
+            messageElements = driver.find_elements(By.CSS_SELECTOR, "div > span > p:first-child, div > div > a:first-child")
             
-            date, last_author, last_time, _messages = printMsg(messageElements, count, date, last_author, last_time)
+            date, last_author, last_time, _messages = printMsg(cleanElements(messageElements), count, date, last_author, last_time)
 
-            messages += _messages
-        else: break
+            for m in _messages:
+                if m in messages:
+                    pass
+                else: 
+                    messages.append(m)
+        else: 
+            break
 
     all_chat_data[chat_name] = messages
 

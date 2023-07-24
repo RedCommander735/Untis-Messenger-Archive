@@ -43,7 +43,7 @@ def download_file(url, download_dir="."):
         return full_path
     except requests.exceptions.RequestException as e:
         print(f"Error downloading the file: {e}")
-        return ''
+        raise FileNotFoundError
 
 
 with open('data.json', 'r') as file:
@@ -55,10 +55,16 @@ for key in data:
     for message in messages:
         link = message['attached_file']
         if link != '':
-            save_path = download_file(link, 'static/downloads')
-            message['storage_path'] = save_path
-            message['has_attachment'] = True
-            print(f'Saved file at {save_path}')
+            try:
+                save_path = download_file(link, 'static/downloads')
+                message['storage_path'] = save_path
+                message['has_attachment'] = True
+                print(f'Saved file at {save_path}')
+            except:
+                save_path = ''
+                message['storage_path'] = save_path
+                message['has_attachment'] = False
+
         else:
             save_path = ''
             message['storage_path'] = save_path

@@ -33,8 +33,15 @@ function main(chats, data, messages) {
         });
         chats.appendChild(chatContainer);
     });
+    chats.querySelector(':first-child').click();
 }
-function loadChat(chat, data, messages) {
+function loadChat(chat, data, messages_container) {
+    try {
+        document.querySelector('#msg').remove();
+    }
+    catch (_a) { }
+    const messages = document.createElement('div');
+    messages.id = 'msg';
     const parser = new DOMParser();
     console.log(chat);
     const currentChat = data[chat];
@@ -52,12 +59,16 @@ function loadChat(chat, data, messages) {
         if (has_attachment) {
             const storage_path = message['storage_path'];
             const temp = storage_path.split('\\');
+            const body = document.createElement('body');
             const fileName = document.createTextNode(temp[temp.length - 1]);
             const messageLink = document.createElement('a');
+            const container = document.createElement('p');
             messageLink.setAttribute('href', storage_path);
             messageLink.appendChild(fileName);
             messageLink.classList.add('file');
-            messageText.appendChild(messageLink);
+            container.appendChild(messageLink);
+            body.appendChild(container);
+            messageText.appendChild(body);
         }
         else {
             const html = parser.parseFromString(message['message'], 'text/html');
@@ -69,14 +80,18 @@ function loadChat(chat, data, messages) {
         messages.appendChild(div);
         currentDate = date;
     });
+    messages_container.appendChild(messages);
     const scrollHeight = messages.scrollHeight;
     messages.scrollTo(0, scrollHeight);
 }
 function createDateHeader(date) {
     const dateHeader = document.createElement('div');
+    const dateContainer = document.createElement('div');
     const dateText = document.createTextNode(date);
+    dateContainer.classList.add('date_container');
+    dateContainer.appendChild(dateText);
     dateHeader.classList.add('date');
-    dateHeader.appendChild(dateText);
+    dateHeader.appendChild(dateContainer);
     return dateHeader;
 }
 function sleep(milliseconds) {
