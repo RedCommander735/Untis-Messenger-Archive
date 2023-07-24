@@ -90,6 +90,7 @@ function loadChat(chat, data, messages_container, chat_title, fullscreen) {
                 const body = document.createElement('body');
                 const fileName = document.createTextNode(temp[temp.length - 1]);
                 const messageLink = document.createElement('a');
+                messageLink.target = '_blank';
                 messageLink.setAttribute('href', storage_path);
                 messageLink.appendChild(fileName);
                 messageLink.classList.add('file');

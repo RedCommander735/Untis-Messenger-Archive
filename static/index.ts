@@ -122,6 +122,7 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
             const body = document.createElement('body')
             const fileName = document.createTextNode(temp[temp.length - 1])
             const messageLink = document.createElement('a')
+            messageLink.target = '_blank'
 
             messageLink.setAttribute('href', storage_path)
             messageLink.appendChild(fileName)
