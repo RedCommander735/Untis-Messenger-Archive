@@ -1,10 +1,11 @@
 # An archiver tool for your webuntis messenger chats before the servers get taken down
 
-## <span style='color: red'>DOWNLOADER IS SOMEHOW BROKEN, MESSAGES GET DOUBLED</span>
-
 Current format: v2
 
+## Still broken
+
 To archive chats, run main.py
+If it somehow does not work, try restarting it a couple of times, and if that does not work either, change the DATE and TEXT to 'c01360' and 'c01362' respectively
 If you also want to archive any files, run download_files.py after running main.py
 
 Run migrate format if you've done your file downloading with v1

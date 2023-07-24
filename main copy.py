@@ -60,14 +60,21 @@ def scrollDownChatList(driver):
 
         last_height = new_height
 
+def cleanElements(elements: List[WebElement]):
+    for element in elements:
+        if (element.get_attribute('tagName') == 'A') and (element.find_element(By.XPATH, '..').get_attribute('tagName') == 'DIV') and (element.find_element(By.XPATH, '../../../../../../..').find_elements(By.CSS_SELECTOR, ':scope > div > div > div > div > span')):
+            elements.remove(element)
 
-def printMsg(_messageElements: List[WebElement], count, date = "01.01.2000", last_author = "null", last_time = "00:00"):
+    return elements
+
+
+def saveMsg(_messageElements: List[WebElement], count, date = "01.01.2000", last_author = "null", last_time = "00:00"):
 
     messages = []
 
     for messageElement in _messageElements:
 
-        messageElement = messageElement.find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
+        messageElement = messageElement.find_element(By.XPATH, '../../../../../../../../..')
         _time = ""
         author = ""
         link = ""
@@ -84,21 +91,25 @@ def printMsg(_messageElements: List[WebElement], count, date = "01.01.2000", las
         elif messageElement.find_elements(By.CSS_SELECTOR, "div > span > p:first-child, div > div > a:first-child"):
             try:
                 author = messageElement.find_element(By.CSS_SELECTOR, "header > span").get_attribute('innerHTML')
+                # DEBUG
+                print(messageElement.find_element(By.CSS_SELECTOR, "header > span").get_attribute('outerHTML'))
                 last_author = author
             except:
                 author = last_author
             try:
                 _time =  messageElement.find_element(By.CSS_SELECTOR, "header > div > span").get_attribute('innerHTML')
+                # DEBUG
+                print(messageElement.find_element(By.CSS_SELECTOR, "header > div > span").get_attribute('outerHTML'))
                 last_time = _time
             except:
                 _time = last_time
                 
-            if (messageElement.find_elements(By.TAG_NAME, "p")):
-                _message = messageElement.find_element(By.TAG_NAME, 'p').find_element(By.XPATH, '..').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
+            if (messageElement.find_elements(By.CSS_SELECTOR, "div > span > p:first-child")):
+                _message = messageElement.find_element(By.CSS_SELECTOR, "div > span > p:first-child").find_element(By.XPATH, '..').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
 
             # TODO Broken, fix
-            if (messageElement.find_elements(By.CSS_SELECTOR, "div > div > a")):
-                link = messageElement.find_element(By.CSS_SELECTOR, 'div > div > a').get_attribute('href')
+            if (messageElement.find_elements(By.CSS_SELECTOR, "div > div > a:first-child")):
+                link = messageElement.find_element(By.CSS_SELECTOR, 'div > div > a:first-child').get_attribute('href')
 
 
             datestring = date + ' ' + _time
@@ -112,6 +123,9 @@ def printMsg(_messageElements: List[WebElement], count, date = "01.01.2000", las
             # TODO Save time, author, message and file for each msg, maybe save profile pics to
 
             print(f'{date}, {_time} - {author}: {_message}, File: {link} \n')
+
+            # DEBUG
+            # time.sleep(5)
 
     return (date, last_author, last_time, messages)
 
@@ -171,13 +185,6 @@ count = 0
 
 all_chat_data = {}
 
-def cleanElements(elements: List[WebElement]):
-    for element in elements:
-        if (element.get_attribute('tagName') == 'A') and (element.find_element(By.XPATH, '../../../../../../..').find_elements(By.CSS_SELECTOR, ':scope > div > div > div > div > span')):
-            elements.remove(element)
-
-    return elements
-
 # TODO Start loop here
 
 for chat in chats:
@@ -189,6 +196,8 @@ for chat in chats:
 
     scrollUpChat(driver)
 
+    time.sleep(1)
+
     currentScroll = 0
 
     scrollHeight = driver.execute_script("try {return document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollHeight} catch (error) {return 0}")
@@ -196,14 +205,11 @@ for chat in chats:
     scrollTopOld = driver.execute_script("try {return document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTop} catch (error) {return 0}")
 
     messageElements = driver.find_elements(By.CSS_SELECTOR, "div > span > p:first-child, div > div > a:first-child")
-
-    
         
-    date, last_author, last_time, messages = printMsg(cleanElements(messageElements), count)
+    date, last_author, last_time, messages = saveMsg(messageElements, count)
 
     while True:
         if (messageElements):
-            # for p; for a 3 more .find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..').find_element(By.XPATH, '..')
             last_element = messageElements[-1]
             if (last_element.get_attribute('tagName') == 'A') and (last_element.find_element(By.XPATH, '../../../../../../../../../..').find_elements(By.CSS_SELECTOR, ':scope > div > button')):
                 last_element = last_element.find_element(By.XPATH, '../../../../../../../../../../../..')
@@ -231,9 +237,11 @@ for chat in chats:
 
             scrollTopOld = scrollTopNew
 
+            time.sleep(1)
+
             messageElements = driver.find_elements(By.CSS_SELECTOR, "div > span > p:first-child, div > div > a:first-child")
             
-            date, last_author, last_time, _messages = printMsg(cleanElements(messageElements), count, date, last_author, last_time)
+            date, last_author, last_time, _messages = saveMsg(messageElements, count, date, last_author, last_time)
 
             for m in _messages:
                 if m in messages:

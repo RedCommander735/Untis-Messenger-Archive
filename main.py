@@ -9,6 +9,9 @@ import sys
 DATE = 'c01362'
 TEXT = 'c01364'
 
+from typing import List
+from selenium.webdriver.remote.webelement import WebElement
+
 
 def scrollUpChat(driver):
     """A method for scrolling the page."""
@@ -62,7 +65,8 @@ def scrollDownChatList(driver):
         last_height = new_height
 
 
-def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null", last_time = "00:00"):
+
+def saveMsg(_messageElements: List[WebElement], count, date = "01.01.2000", last_author = "null", last_time = "00:00"):
 
     messages = []
 
@@ -77,7 +81,7 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
         if DATE in messageElement.get_attribute("class"):
             date = messageElement.find_element(By.TAG_NAME, "span").get_attribute('innerHTML').replace('Heute, ', '').replace('Gestern, ', '').replace(' Jan. ', '01.').replace(' Feb. ', '02.').replace(' März ', '03.').replace(' Apr. ', '04.').replace(' Mai ', '05.').replace(' Juni ', '06.').replace(' Juli ', '07.').replace(' Aug. ', '08.').replace(' Sept. ', '09.').replace(' Okt. ', '10.').replace(' Nov. ', '11.').replace(' Dez. ', '12.')
 
-            print("\n\n" + date + ":\n")
+            # print("\n\n" + date + ":\n")
 
         # elif "c01364" in messageElement.get_attribute("class"):
         elif TEXT in messageElement.get_attribute("class"):
@@ -97,8 +101,8 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
                 _message = messageElement.find_element(By.TAG_NAME, 'p').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
 
             # TODO Broken, fix
-            if (messageElement.find_elements(By.CSS_SELECTOR, ".c01398 > div > .c01408 a")):
-                link = messageElement.find_element(By.CSS_SELECTOR, '.c01398 > div > .c01408 a').get_attribute('href')
+            if (messageElement.find_elements(By.CSS_SELECTOR, "a.c01417")):
+                link = messageElement.find_element(By.CSS_SELECTOR, 'a.c01417').get_attribute('href')
 
 
             datestring = date + ' ' + _time
@@ -107,7 +111,9 @@ def printMsg(_messageElements, count, date = "01.01.2000", last_author = "null",
             
             data = {'unix_time': _date, 'date': date, 'time': _time, 'author': author, 'message': _message, 'attached_file': link}
 
-            messages.append(data)
+
+            if data not in messages:
+                messages.append(data)
             # TODO Save time, author, message and file for each msg, maybe save profile pics to
 
             print(f'{date}, {_time} - {author}: {_message}, File: {link} \n')
@@ -188,7 +194,7 @@ for chat in chats:
 
     messageElements = driver.find_elements(By.CSS_SELECTOR, f".{DATE}, .{TEXT}")
         
-    date, last_author, last_time, messages = printMsg(messageElements, count)
+    date, last_author, last_time, messages = saveMsg(messageElements, count)
 
     while True:
         if (messageElements):
@@ -196,7 +202,7 @@ for chat in chats:
             height = last_element.value_of_css_property('height').replace('px', '')
             top = last_element.value_of_css_property('top').replace('px', '')
 
-            currentScroll = float(height) + int(top) + 145
+            currentScroll = float(height) + int(top)
             
 
             driver.execute_script("try {document.getElementsByClassName('ReactVirtualized__Grid ReactVirtualized__List')[0].scrollTop = " + str(currentScroll) + "} catch (error) {}")
@@ -208,12 +214,21 @@ for chat in chats:
 
             scrollTopOld = scrollTopNew
 
+
+
             messageElements = driver.find_elements(By.CSS_SELECTOR, f".{DATE}, .{TEXT}")
             
-            date, last_author, last_time, _messages = printMsg(messageElements, count, date, last_author, last_time)
+            date, last_author, last_time, _messages = saveMsg(messageElements, count, date, last_author, last_time)
 
-            messages += _messages
-        else: break
+            for _m in _messages:
+                for m in messages:
+                    if m['message'] == _m['message'] and m['time'] == _m['time'] and m['author'] == _m['author']:
+                        continue
+                if _m not in messages:
+                    messages.append(m)
+                    
+        else: 
+            break
 
     all_chat_data[chat_name] = messages
 
