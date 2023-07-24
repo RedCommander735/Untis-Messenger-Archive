@@ -3,6 +3,7 @@ import requests
 import random
 import string
 import json
+import shutil
 
 def download_file(url, download_dir="."):
 
@@ -40,10 +41,16 @@ def download_file(url, download_dir="."):
             for chunk in response.iter_content(chunk_size=8192):
                 f.write(chunk)
 
-        return full_path
+        # Get the MIME type of the downloaded file
+        mime_type = response.headers.get('Content-Type')
+
+        return full_path, mime_type
     except requests.exceptions.RequestException as e:
         print(f"Error downloading the file: {e}")
         raise FileNotFoundError
+    
+if os.path.exists("static/downloads"):
+  shutil.rmtree("static/downloads")
 
 
 with open('data.json', 'r') as file:
@@ -56,19 +63,22 @@ for key in data:
         link = message['attached_file']
         if link != '':
             try:
-                save_path = download_file(link, 'static/downloads')
+                save_path, mime_type = download_file(link, 'static/downloads')
                 message['storage_path'] = save_path
                 message['has_attachment'] = True
+                message['mime_type'] = mime_type
                 print(f'Saved file at {save_path}')
             except:
                 save_path = ''
                 message['storage_path'] = save_path
                 message['has_attachment'] = False
+                message['mime_type'] = ''
 
         else:
             save_path = ''
             message['storage_path'] = save_path
             message['has_attachment'] = False
+            message['mime_type'] = ''
 
 with open('static/data_with_files_v2.json', 'w') as file:
     json.dump(data, file, indent=4)

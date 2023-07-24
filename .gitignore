@@ -1,3 +1,4 @@
 *.json
 downloads
 __pycache__
+*.log

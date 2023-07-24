@@ -17,16 +17,17 @@ async function init() {
     const app = document.getElementById('app')!
     const chats = document.getElementById('chats')!
     const messages = document.getElementById('messages')!
+    const chat_title = document.getElementById('chat_title')!
 
     // fetch data
     const data = await fetch('/static/data_with_files_v2.json')
         .then(response => response.json())
 
 
-    main(chats, data, messages)
+    main(chats, data, messages, chat_title)
 }
 
-function main(chats: HTMLElement, data: Chats, messages: HTMLElement) {
+function main(chats: HTMLElement, data: Chats, messages: HTMLElement, chat_title: HTMLElement) {
 
     Object.keys(data).forEach(chat => {
         const chatContainer = document.createElement('div')
@@ -39,9 +40,13 @@ function main(chats: HTMLElement, data: Chats, messages: HTMLElement) {
             event.preventDefault()
             event.stopPropagation()
 
+            const target = (event.target as HTMLElement)
+
+            indicator(chats, target)
+
             const name = (event.target as HTMLElement).innerHTML
 
-            loadChat(name, data, messages)
+            loadChat(name, data, messages, chat_title)
         })
 
         chats.appendChild(chatContainer)
@@ -49,7 +54,20 @@ function main(chats: HTMLElement, data: Chats, messages: HTMLElement) {
     (chats.querySelector(':first-child') as HTMLElement)!.click()
 }
 
-function loadChat(chat: string, data: Chats, messages_container: HTMLElement) {
+function indicator(chats: HTMLElement, target: HTMLElement) {
+    const children = chats.children
+
+    for (let i = 0; i < children.length; i++) {
+        const chat = children.item(i)! as HTMLElement
+        chat.classList.remove('indicator')
+    }
+
+    target.classList.add('indicator')
+}
+
+async function loadChat(chat: string, data: Chats, messages_container: HTMLElement, chat_title: HTMLElement) {
+    const acceptable_images = ['image/apng', 'image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/webp']
+
     try {
         document.querySelector('#msg')!.remove()
     } catch {}
@@ -58,18 +76,34 @@ function loadChat(chat: string, data: Chats, messages_container: HTMLElement) {
     const messages = document.createElement('div')
     messages.id = 'msg' 
     const parser = new DOMParser()
+    
+    chat_title.innerHTML = chat
     console.log(chat)
     const currentChat = data[chat]!
 
     let currentDate = currentChat[0]['date']
     messages.appendChild(createDateHeader(currentDate))
 
-    currentChat.forEach(message => {
+    currentChat.forEach(async message => {
         const div = document.createElement('div')
         let messageText = document.createElement('p')
 
         const date = message['date']
-        messageText.appendChild(document.createTextNode(`${message['time']} - ${message['author']}: `))
+        const headerSpan = document.createElement('span')
+        const time = document.createElement('span')
+        const author = document.createElement('span')
+
+        time.classList.add('message_time')
+        author.classList.add('message_author')
+        headerSpan.classList.add('message_header')
+
+        time.appendChild(document.createTextNode(message['time']))
+        author.appendChild(document.createTextNode(message['author']))
+
+        headerSpan.appendChild(author)
+        headerSpan.appendChild(time)
+        messageText.appendChild(headerSpan)
+
         const has_attachment = message['has_attachment']
 
         if (date != currentDate) {
@@ -82,13 +116,21 @@ function loadChat(chat: string, data: Chats, messages_container: HTMLElement) {
             const body = document.createElement('body')
             const fileName = document.createTextNode(temp[temp.length - 1])
             const messageLink = document.createElement('a')
-            const container = document.createElement('p')
 
             messageLink.setAttribute('href', storage_path)
             messageLink.appendChild(fileName)
             messageLink.classList.add('file')
-            container.appendChild(messageLink)
-            body.appendChild(container)
+
+            // const file = await fetch(storage_path.replace('\\', '/'))
+            // const mime = file.headers.get('content-type') != null ? file.headers.get('content-type')! : 'no-content-type'
+
+            // if (acceptable_images.includes(mime)) {
+            //     const image = document.createElement('img')
+            //     image.src = storage_path
+            //     image.
+            // }
+
+            body.appendChild(messageLink)
             messageText.appendChild(body)
         } else {
             const html = parser.parseFromString(message['message'], 'text/html')

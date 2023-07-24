@@ -222,10 +222,9 @@ for chat in chats:
 
             for _m in _messages:
                 for m in messages:
-                    if m['message'] == _m['message'] and m['time'] == _m['time'] and m['author'] == _m['author']:
-                        continue
-                if _m not in messages:
-                    messages.append(m)
+                    if (m['message'] != _m['message']) and (m['time'] != _m['time']) and (m['author'] != _m['author']):     
+                        if _m not in messages:
+                            messages.append(_m)
                     
         else: 
             break

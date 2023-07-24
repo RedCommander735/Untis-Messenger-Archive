@@ -13,13 +13,14 @@ function init() {
         const app = document.getElementById('app');
         const chats = document.getElementById('chats');
         const messages = document.getElementById('messages');
+        const chat_title = document.getElementById('chat_title');
         // fetch data
         const data = yield fetch('/static/data_with_files_v2.json')
             .then(response => response.json());
-        main(chats, data, messages);
+        main(chats, data, messages, chat_title);
     });
 }
-function main(chats, data, messages) {
+function main(chats, data, messages, chat_title) {
     Object.keys(data).forEach(chat => {
         const chatContainer = document.createElement('div');
         const chatName = document.createTextNode(chat);
@@ -28,61 +29,90 @@ function main(chats, data, messages) {
         chatContainer.addEventListener('click', (event) => {
             event.preventDefault();
             event.stopPropagation();
+            const target = event.target;
+            indicator(chats, target);
             const name = event.target.innerHTML;
-            loadChat(name, data, messages);
+            loadChat(name, data, messages, chat_title);
         });
         chats.appendChild(chatContainer);
     });
     chats.querySelector(':first-child').click();
 }
-function loadChat(chat, data, messages_container) {
-    try {
-        document.querySelector('#msg').remove();
+function indicator(chats, target) {
+    const children = chats.children;
+    for (let i = 0; i < children.length; i++) {
+        const chat = children.item(i);
+        chat.classList.remove('indicator');
     }
-    catch (_a) { }
-    const messages = document.createElement('div');
-    messages.id = 'msg';
-    const parser = new DOMParser();
-    console.log(chat);
-    const currentChat = data[chat];
-    let currentDate = currentChat[0]['date'];
-    messages.appendChild(createDateHeader(currentDate));
-    currentChat.forEach(message => {
-        const div = document.createElement('div');
-        let messageText = document.createElement('p');
-        const date = message['date'];
-        messageText.appendChild(document.createTextNode(`${message['time']} - ${message['author']}: `));
-        const has_attachment = message['has_attachment'];
-        if (date != currentDate) {
-            messages.appendChild(createDateHeader(date));
+    target.classList.add('indicator');
+}
+function loadChat(chat, data, messages_container, chat_title) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const acceptable_images = ['image/apng', 'image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
+        try {
+            document.querySelector('#msg').remove();
         }
-        if (has_attachment) {
-            const storage_path = message['storage_path'];
-            const temp = storage_path.split('\\');
-            const body = document.createElement('body');
-            const fileName = document.createTextNode(temp[temp.length - 1]);
-            const messageLink = document.createElement('a');
-            const container = document.createElement('p');
-            messageLink.setAttribute('href', storage_path);
-            messageLink.appendChild(fileName);
-            messageLink.classList.add('file');
-            container.appendChild(messageLink);
-            body.appendChild(container);
-            messageText.appendChild(body);
-        }
-        else {
-            const html = parser.parseFromString(message['message'], 'text/html');
-            // console.log(html.body)
-            messageText.appendChild(html.body);
-        }
-        div.appendChild(messageText);
-        div.classList.add('message');
-        messages.appendChild(div);
-        currentDate = date;
+        catch (_a) { }
+        const messages = document.createElement('div');
+        messages.id = 'msg';
+        const parser = new DOMParser();
+        chat_title.innerHTML = chat;
+        console.log(chat);
+        const currentChat = data[chat];
+        let currentDate = currentChat[0]['date'];
+        messages.appendChild(createDateHeader(currentDate));
+        currentChat.forEach((message) => __awaiter(this, void 0, void 0, function* () {
+            const div = document.createElement('div');
+            let messageText = document.createElement('p');
+            const date = message['date'];
+            const headerSpan = document.createElement('span');
+            const time = document.createElement('span');
+            const author = document.createElement('span');
+            time.classList.add('message_time');
+            author.classList.add('message_author');
+            headerSpan.classList.add('message_header');
+            time.appendChild(document.createTextNode(message['time']));
+            author.appendChild(document.createTextNode(message['author']));
+            headerSpan.appendChild(author);
+            headerSpan.appendChild(time);
+            messageText.appendChild(headerSpan);
+            const has_attachment = message['has_attachment'];
+            if (date != currentDate) {
+                messages.appendChild(createDateHeader(date));
+            }
+            if (has_attachment) {
+                const storage_path = message['storage_path'];
+                const temp = storage_path.split('\\');
+                const body = document.createElement('body');
+                const fileName = document.createTextNode(temp[temp.length - 1]);
+                const messageLink = document.createElement('a');
+                messageLink.setAttribute('href', storage_path);
+                messageLink.appendChild(fileName);
+                messageLink.classList.add('file');
+                // const file = await fetch(storage_path.replace('\\', '/'))
+                // const mime = file.headers.get('content-type') != null ? file.headers.get('content-type')! : 'no-content-type'
+                // if (acceptable_images.includes(mime)) {
+                //     const image = document.createElement('img')
+                //     image.src = storage_path
+                //     image.
+                // }
+                body.appendChild(messageLink);
+                messageText.appendChild(body);
+            }
+            else {
+                const html = parser.parseFromString(message['message'], 'text/html');
+                // console.log(html.body)
+                messageText.appendChild(html.body);
+            }
+            div.appendChild(messageText);
+            div.classList.add('message');
+            messages.appendChild(div);
+            currentDate = date;
+        }));
+        messages_container.appendChild(messages);
+        const scrollHeight = messages.scrollHeight;
+        messages.scrollTo(0, scrollHeight);
     });
-    messages_container.appendChild(messages);
-    const scrollHeight = messages.scrollHeight;
-    messages.scrollTo(0, scrollHeight);
 }
 function createDateHeader(date) {
     const dateHeader = document.createElement('div');
