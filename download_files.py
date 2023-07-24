@@ -44,7 +44,10 @@ def download_file(url, download_dir="."):
         # Get the MIME type of the downloaded file
         mime_type = response.headers.get('Content-Type')
 
-        return full_path, mime_type
+        if 'text/html' not in mime_type:
+            return full_path, mime_type
+        else:
+            raise FileNotFoundError
     except requests.exceptions.RequestException as e:
         print(f"Error downloading the file: {e}")
         raise FileNotFoundError

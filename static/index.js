@@ -14,13 +14,17 @@ function init() {
         const chats = document.getElementById('chats');
         const messages = document.getElementById('messages');
         const chat_title = document.getElementById('chat_title');
+        const fullscreen = document.getElementById('fullscreen');
+        fullscreen.addEventListener('click', () => {
+            fullscreen.classList.add('invisible');
+        });
         // fetch data
         const data = yield fetch('/static/data_with_files_v2.json')
             .then(response => response.json());
-        main(chats, data, messages, chat_title);
+        main(chats, data, messages, chat_title, fullscreen);
     });
 }
-function main(chats, data, messages, chat_title) {
+function main(chats, data, messages, chat_title, fullscreen) {
     Object.keys(data).forEach(chat => {
         const chatContainer = document.createElement('div');
         const chatName = document.createTextNode(chat);
@@ -32,7 +36,7 @@ function main(chats, data, messages, chat_title) {
             const target = event.target;
             indicator(chats, target);
             const name = event.target.innerHTML;
-            loadChat(name, data, messages, chat_title);
+            loadChat(name, data, messages, chat_title, fullscreen);
         });
         chats.appendChild(chatContainer);
     });
@@ -46,7 +50,7 @@ function indicator(chats, target) {
     }
     target.classList.add('indicator');
 }
-function loadChat(chat, data, messages_container, chat_title) {
+function loadChat(chat, data, messages_container, chat_title, fullscreen) {
     return __awaiter(this, void 0, void 0, function* () {
         const acceptable_images = ['image/apng', 'image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/webp'];
         try {
@@ -89,14 +93,24 @@ function loadChat(chat, data, messages_container, chat_title) {
                 messageLink.setAttribute('href', storage_path);
                 messageLink.appendChild(fileName);
                 messageLink.classList.add('file');
-                // const file = await fetch(storage_path.replace('\\', '/'))
-                // const mime = file.headers.get('content-type') != null ? file.headers.get('content-type')! : 'no-content-type'
-                // if (acceptable_images.includes(mime)) {
-                //     const image = document.createElement('img')
-                //     image.src = storage_path
-                //     image.
-                // }
                 body.appendChild(messageLink);
+                body.classList.add('file_container');
+                const mime = message['mime_type'];
+                if (acceptable_images.includes(mime)) {
+                    const image = document.createElement('img');
+                    image.classList.add('embedd');
+                    image.src = storage_path;
+                    image.addEventListener('click', function () {
+                        fullscreen.style.backgroundImage = 'url(' + image.src + ')';
+                        fullscreen.classList.remove('invisible');
+                    });
+                    body.appendChild(image);
+                }
+                if (message['message'] != '') {
+                    const html = parser.parseFromString(message['message'], 'text/html');
+                    // console.log(html.body)
+                    messageText.appendChild(html.body);
+                }
                 messageText.appendChild(body);
             }
             else {
@@ -110,8 +124,10 @@ function loadChat(chat, data, messages_container, chat_title) {
             currentDate = date;
         }));
         messages_container.appendChild(messages);
-        const scrollHeight = messages.scrollHeight;
-        messages.scrollTo(0, scrollHeight);
+        setTimeout(() => {
+            const scrollHeight = messages.scrollHeight;
+            messages.scrollTo(0, scrollHeight);
+        }, 200);
     });
 }
 function createDateHeader(date) {
@@ -123,8 +139,5 @@ function createDateHeader(date) {
     dateHeader.classList.add('date');
     dateHeader.appendChild(dateContainer);
     return dateHeader;
-}
-function sleep(milliseconds) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
 }
 document.addEventListener('DOMContentLoaded', init);

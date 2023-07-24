@@ -11,6 +11,7 @@ interface Message {
     attached_file: string;
     storage_path: string;
     has_attachment: boolean;
+    mime_type: string
 }
   
 async function init() {
@@ -18,16 +19,21 @@ async function init() {
     const chats = document.getElementById('chats')!
     const messages = document.getElementById('messages')!
     const chat_title = document.getElementById('chat_title')!
+    const fullscreen = document.getElementById('fullscreen')!
+
+    fullscreen.addEventListener('click', () => {
+        fullscreen.classList.add('invisible')
+    })
 
     // fetch data
     const data = await fetch('/static/data_with_files_v2.json')
         .then(response => response.json())
 
 
-    main(chats, data, messages, chat_title)
+    main(chats, data, messages, chat_title, fullscreen)
 }
 
-function main(chats: HTMLElement, data: Chats, messages: HTMLElement, chat_title: HTMLElement) {
+function main(chats: HTMLElement, data: Chats, messages: HTMLElement, chat_title: HTMLElement, fullscreen: HTMLElement) {
 
     Object.keys(data).forEach(chat => {
         const chatContainer = document.createElement('div')
@@ -46,7 +52,7 @@ function main(chats: HTMLElement, data: Chats, messages: HTMLElement, chat_title
 
             const name = (event.target as HTMLElement).innerHTML
 
-            loadChat(name, data, messages, chat_title)
+            loadChat(name, data, messages, chat_title, fullscreen)
         })
 
         chats.appendChild(chatContainer)
@@ -65,7 +71,7 @@ function indicator(chats: HTMLElement, target: HTMLElement) {
     target.classList.add('indicator')
 }
 
-async function loadChat(chat: string, data: Chats, messages_container: HTMLElement, chat_title: HTMLElement) {
+async function loadChat(chat: string, data: Chats, messages_container: HTMLElement, chat_title: HTMLElement, fullscreen: HTMLElement) {
     const acceptable_images = ['image/apng', 'image/avif', 'image/gif', 'image/jpeg', 'image/png', 'image/svg+xml', 'image/webp']
 
     try {
@@ -121,17 +127,33 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
             messageLink.appendChild(fileName)
             messageLink.classList.add('file')
 
-            // const file = await fetch(storage_path.replace('\\', '/'))
-            // const mime = file.headers.get('content-type') != null ? file.headers.get('content-type')! : 'no-content-type'
-
-            // if (acceptable_images.includes(mime)) {
-            //     const image = document.createElement('img')
-            //     image.src = storage_path
-            //     image.
-            // }
-
             body.appendChild(messageLink)
+            body.classList.add('file_container')
+
+            const mime = message['mime_type']
+
+            if (acceptable_images.includes(mime)) {
+                const image = document.createElement('img')
+
+                image.classList.add('embedd')
+                image.src = storage_path
+
+                image.addEventListener('click', function() {
+                    fullscreen.style.backgroundImage = 'url(' + image.src + ')';
+                    fullscreen.classList.remove('invisible')
+                  });
+
+                body.appendChild(image)
+            }
+
+            if (message['message'] != '') {
+                const html = parser.parseFromString(message['message'], 'text/html')
+                // console.log(html.body)
+                messageText.appendChild(html.body);
+            }
+
             messageText.appendChild(body)
+            
         } else {
             const html = parser.parseFromString(message['message'], 'text/html')
             // console.log(html.body)
@@ -146,8 +168,11 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
     });
     messages_container.appendChild(messages)
 
-    const scrollHeight = messages.scrollHeight
-    messages.scrollTo(0, scrollHeight)
+    setTimeout(() => {
+        const scrollHeight = messages.scrollHeight
+        messages.scrollTo(0, scrollHeight)
+    }, 200);
+    
 }
 
 function createDateHeader(date: string) {
@@ -161,9 +186,5 @@ function createDateHeader(date: string) {
 
     return dateHeader
 }
-
-function sleep(milliseconds: number) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
-   }
 
 document.addEventListener('DOMContentLoaded', init)
