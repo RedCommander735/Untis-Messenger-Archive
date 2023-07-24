@@ -1,6 +1,6 @@
 # An archiver tool for your webuntis messenger chats before the servers get taken down
 
-## <span style='color: red'>DOWNLOADER IS SOMEHOW BROKEN, MESSAGES GET DOUBLED</span>
+## DOWNLOADER IS SOMEHOW BROKEN, MESSAGES GET DOUBLED
 
 Current format: v2
 
