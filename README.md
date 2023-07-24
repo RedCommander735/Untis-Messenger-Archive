@@ -14,4 +14,6 @@ Run migrate format if you've done your file downloading with v1
 - [x] Download files and add references to json
 - [x] Save data as JSON object (each chat --> messages, message --> (Time, author, profile pic, [file], [msg])); added TODOs everywhere data is to be saved
 - [x] Read username and password from file
-- [ ] Add some kind of interface to view archived chats
+- [x] Add some kind of interface to view archived chats
+    - [ ] Add previews for images
+    
