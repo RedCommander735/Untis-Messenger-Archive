@@ -18,6 +18,6 @@ If it somehow does not work, try restarting it a couple of times, and if that do
 - [x] Save data as JSON object (each chat --> messages, message --> (Time, author, profile pic, [file], [msg])); added TODOs everywhere data is to be saved
 - [x] Read username and password from file
 - [x] Add some kind of interface to view archived chats
-    - [ ] Add previews for images
+    - [x] Add previews for images
 - [ ] Edit mode for deleting (duplictate) messages
 
