@@ -2,6 +2,7 @@
 
 To archive chats, run main.py
 
+The viewer only works if you also download files
 Sometimes messages can be duplicated and inserted at a later time, the first instance of a message is always the original.
 
 

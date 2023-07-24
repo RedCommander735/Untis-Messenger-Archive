@@ -97,8 +97,8 @@ def saveMsg(_messageElements: List[WebElement], count, date = "01.01.2000", last
             except:
                 _time = last_time
                 
-            if (messageElement.find_elements(By.TAG_NAME, "p")):
-                _message = messageElement.find_element(By.TAG_NAME, 'p').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
+            if (messageElement.find_elements(By.CSS_SELECTOR, "span > p:first-child")):
+                _message = messageElement.find_element(By.CSS_SELECTOR, "span > p:first-child").find_element(By.XPATH, '..').get_attribute('innerHTML').replace('https://grape-21.webuntis.com/static/app/images/emoji_sheet_64_optimized.png', '/static/emoji_sheet_64_optimized.png')
 
             # TODO Broken, fix
             if (messageElement.find_elements(By.CSS_SELECTOR, "a.c01417")):
@@ -242,6 +242,3 @@ with open('data.json', 'w', encoding='UTF-8') as file:
 print("Done!")
 time.sleep(2)
 driver.close()
-
-
-
