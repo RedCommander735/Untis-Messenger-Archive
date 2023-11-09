@@ -3,6 +3,8 @@
 To archive chats, install the requirements by running 'pip install -r requirements.txt', then run main.py.  
 If you also want to archive any files, run download_files.py after running main.py.
 
+**Downloader files have been crippeled to prevent it from destroying existing archive files, whilst trying to download non existing messages from dead severs :)**
+
 The viewer only works if you also download files.  
 Sometimes messages can be duplicated and inserted at a later time, the first instance of a message is always the original.
 
