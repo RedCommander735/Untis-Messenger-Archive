@@ -1,9 +1,11 @@
 # An archiver tool for our Webuntis messenger chats before the servers get taken down
 
+I have archived this repo, since the messenger no longer exists and the viewer is pretty much in its final state, so there is no need to maintain this project :).
+
 To archive chats, install the requirements by running 'pip install -r requirements.txt', then run main.py.  
 If you also want to archive files, run download_files.py after running main.py.
 
-**Downloader files have been crippled to prevent it from destroying existing archive files, whilst trying to download non-existing messages from dead servers :)**
+***Downloader files have been crippled to prevent it from destroying existing archive files, whilst trying to download non-existing messages from dead servers :)***
 
 The viewer only works if you also download files.  
 Sometimes messages can be duplicated and inserted at a later time, the first instance of a message is always the original.
