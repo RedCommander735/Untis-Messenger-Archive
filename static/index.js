@@ -65,70 +65,81 @@ function loadChat(chat, data, messages_container, chat_title, fullscreen) {
         const currentChat = data[chat];
         let currentDate = currentChat[0]['date'];
         messages.appendChild(createDateHeader(currentDate));
-        currentChat.forEach((message) => __awaiter(this, void 0, void 0, function* () {
-            const div = document.createElement('div');
-            let messageText = document.createElement('p');
-            const date = message['date'];
-            const headerSpan = document.createElement('span');
-            const time = document.createElement('span');
-            const author = document.createElement('span');
-            time.classList.add('message_time');
-            author.classList.add('message_author');
-            headerSpan.classList.add('message_header');
-            time.appendChild(document.createTextNode(message['time']));
-            author.appendChild(document.createTextNode(message['author']));
-            headerSpan.appendChild(author);
-            headerSpan.appendChild(time);
-            messageText.appendChild(headerSpan);
-            const has_attachment = message['has_attachment'];
-            if (date != currentDate) {
-                messages.appendChild(createDateHeader(date));
-            }
-            if (has_attachment) {
-                const storage_path = message['storage_path'];
-                const temp = storage_path.split('\\');
-                const body = document.createElement('body');
-                const fileName = document.createTextNode(temp[temp.length - 1]);
-                const messageLink = document.createElement('a');
-                messageLink.target = '_blank';
-                messageLink.setAttribute('href', storage_path);
-                messageLink.appendChild(fileName);
-                messageLink.classList.add('file');
-                body.appendChild(messageLink);
-                body.classList.add('file_container');
-                const mime = message['mime_type'];
-                if (acceptable_images.includes(mime)) {
-                    const image = document.createElement('img');
-                    image.classList.add('embedd');
-                    image.src = storage_path;
-                    image.addEventListener('click', function () {
-                        fullscreen.style.backgroundImage = 'url(' + image.src + ')';
-                        fullscreen.classList.remove('invisible');
-                    });
-                    body.appendChild(image);
+        let p = new Promise((resolve, reject) => {
+            currentChat.forEach((message) => __awaiter(this, void 0, void 0, function* () {
+                const div = document.createElement('div');
+                let messageText = document.createElement('p');
+                const date = message['date'];
+                const headerSpan = document.createElement('span');
+                const time = document.createElement('span');
+                const author = document.createElement('span');
+                time.classList.add('message_time');
+                author.classList.add('message_author');
+                headerSpan.classList.add('message_header');
+                time.appendChild(document.createTextNode(message['time']));
+                author.appendChild(document.createTextNode(message['author']));
+                headerSpan.appendChild(author);
+                headerSpan.appendChild(time);
+                messageText.appendChild(headerSpan);
+                const has_attachment = message['has_attachment'];
+                if (date != currentDate) {
+                    messages.appendChild(createDateHeader(date));
                 }
-                if (message['message'] != '') {
+                if (has_attachment) {
+                    const storage_path = message['storage_path'];
+                    const temp = storage_path.split('\\');
+                    const body = document.createElement('body');
+                    const fileName = document.createTextNode(temp[temp.length - 1]);
+                    const messageLink = document.createElement('a');
+                    messageLink.target = '_blank';
+                    messageLink.setAttribute('href', storage_path);
+                    messageLink.appendChild(fileName);
+                    messageLink.classList.add('file');
+                    body.appendChild(messageLink);
+                    body.classList.add('file_container');
+                    const mime = message['mime_type'];
+                    if (acceptable_images.includes(mime)) {
+                        const image = document.createElement('img');
+                        image.classList.add('embedd');
+                        image.onload = () => {
+                            const scrollHeight = messages.scrollHeight;
+                            messages.scrollTo(0, scrollHeight);
+                            image.onload = null;
+                        };
+                        image.src = storage_path;
+                        image.addEventListener('click', function () {
+                            fullscreen.style.backgroundImage = 'url(' + image.src + ')';
+                            fullscreen.classList.remove('invisible');
+                        });
+                        body.classList.add('image_file_container');
+                        body.appendChild(image);
+                    }
+                    if (message['message'] != '') {
+                        const html = parser.parseFromString(message['message'], 'text/html');
+                        // console.log(html.body)
+                        messageText.appendChild(html.body);
+                    }
+                    messageText.appendChild(body);
+                }
+                else {
                     const html = parser.parseFromString(message['message'], 'text/html');
                     // console.log(html.body)
                     messageText.appendChild(html.body);
                 }
-                messageText.appendChild(body);
-            }
-            else {
-                const html = parser.parseFromString(message['message'], 'text/html');
-                // console.log(html.body)
-                messageText.appendChild(html.body);
-            }
-            div.appendChild(messageText);
-            div.classList.add('message');
-            messages.appendChild(div);
-            currentDate = date;
-        }));
-        messages_container.appendChild(messages);
-        setTimeout(() => {
+                div.appendChild(messageText);
+                div.classList.add('message');
+                messages.appendChild(div);
+                currentDate = date;
+            }));
+            messages_container.appendChild(messages);
+            let bottom = document.createElement("div");
+            bottom.id = "bottom";
+            messages_container.appendChild(bottom);
+            resolve();
+        }).then(() => {
             const scrollHeight = messages.scrollHeight;
             messages.scrollTo(0, scrollHeight);
-        }, 200);
+        });
     });
 }
 function createDateHeader(date) {

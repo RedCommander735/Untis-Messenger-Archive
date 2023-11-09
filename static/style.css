@@ -1,6 +1,14 @@
 :root {
     /* font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
     font-family: noto-sans, "Helvetica Neue", Arial, Helvetica, sans-serif;
+
+    --primary: #ffffff;
+    --secondary: #000000;
+    --msg-color: color-mix(in srgb, var(--secondary) 10%, transparent);
+
+    color: var(--secondary);
+    background-color: var(--primary);
+
 }
 
 body {
@@ -11,9 +19,9 @@ body {
 
 #global_header {
     min-height: 50px;
-    background-color: #ffffff;
+    background-color: var(--primary);
     box-sizing: border-box;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid var(--secondary);
     display: flex;
 }
 
@@ -21,7 +29,7 @@ body {
     font-size: 18px;
     font-weight: bold;
     min-width: 300px;
-    border-right: 1px solid black;
+    border-right: 1px solid var(--secondary);
     display: grid;
     align-items: center;
     justify-content: center;
@@ -49,7 +57,7 @@ body {
     min-width: 300px;
     max-width: 300px;
     height: calc(100vh - 50px);
-    border-right: 1px solid black;
+    border-right: 1px solid var(--secondary);
     overflow-y: scroll;
 }
 
@@ -74,7 +82,7 @@ body {
     background-size: contain;
     background-repeat: no-repeat no-repeat;
     background-position: center center;
-    background-color: rgba(0,0,0,0.80);
+    background-color: color-mix(in srgb, #000000 80%, transparent);
     cursor: zoom-out;
 }
 
@@ -101,26 +109,12 @@ body {
     margin: 0;
     content: "";
     position: absolute;
-    background: rgba(0,0,0,0.10);
-  }
-
-/* .date:not(:nth-child(2n)) > .date_container {
-    border: 1px solid #868686;
-    background-color: #f8f8f8;
-    padding: 5px 10px;
-    border-radius: 10px;
+    background: color-mix(in srgb, var(--secondary) 10%, transparent);
 }
 
-.date:nth-child(2n) > .date_container {
-    border: 1px solid #868686;
-    background-color: #ffffff;
-    padding: 5px 10px;
-    border-radius: 10px;
-} */
-
 .date_container {
-    border: 1px solid rgba(0,0,0,0.10);
-    background-color: #ffffff;
+    border: 1px solid color-mix(in srgb, var(--secondary) 10%, transparent); 
+    background-color: var(--primary);
     padding: 5px 10px;
     border-radius: 10px;
 }
@@ -139,11 +133,19 @@ body {
     font-weight: bold;
     text-decoration: none;
     max-width: fit-content;
+    overflow-wrap: anywhere;
+}
+
+.file:hover {
+    text-decoration: underline;
 }
 
 .file_container {
     display: flex;
     flex-direction: column;
+}
+
+.image_file_container {
     max-width: 20% !important;
 }
 
@@ -154,7 +156,7 @@ body {
 
 .message body {
     margin-top: 3px;
-    background-color: #eeeeee;
+    background-color: var(--msg-color);
     padding-top: 8px;
     padding-bottom: 8px;
     padding-left: 15px;
@@ -175,7 +177,7 @@ body {
 }
 
 .message_time {
-    color: #949494;
+    color: color-mix(in srgb, var(--secondary) 55%, transparent);
     font-size: 11px;
 }
 
@@ -183,10 +185,6 @@ body {
 .message body p {
     margin: 0;
 }
-
-/* .message:nth-child(2n), .date:nth-child(2n) {
-    background-color: #f8f8f8;
-} */
 
 .chat_container {
     font-size: 14px;
@@ -198,10 +196,25 @@ body {
 }
 
 .chat_container:hover {
-    background-color: #eeeeee;
+    background-color: var(--msg-color);
 }
 
 .indicator {
     font-weight: bold;
-    background-color: #dddddd !important;
+    background-color: color-mix(in srgb, var(--secondary) 13%, transparent) !important;
 }
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --primary: #272727;
+        --secondary: #ffffff;
+    }
+
+    a:link {
+        color: #3399ff;
+    }
+
+    a:visited {
+        color: #af76e5;
+    }
+  }

@@ -90,6 +90,8 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
     let currentDate = currentChat[0]['date']
     messages.appendChild(createDateHeader(currentDate))
 
+    let p = new Promise<void>((resolve, reject) => {
+
     currentChat.forEach(async message => {
         const div = document.createElement('div')
         let messageText = document.createElement('p')
@@ -130,6 +132,7 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
 
             body.appendChild(messageLink)
             body.classList.add('file_container')
+            
 
             const mime = message['mime_type']
 
@@ -137,6 +140,11 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
                 const image = document.createElement('img')
 
                 image.classList.add('embedd')
+                image.onload = () => { 
+                    const scrollHeight = messages.scrollHeight
+                    messages.scrollTo(0, scrollHeight) 
+                    image.onload = null
+                }
                 image.src = storage_path
 
                 image.addEventListener('click', function() {
@@ -144,6 +152,7 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
                     fullscreen.classList.remove('invisible')
                   });
 
+                body.classList.add('image_file_container')
                 body.appendChild(image)
             }
 
@@ -168,12 +177,18 @@ async function loadChat(chat: string, data: Chats, messages_container: HTMLEleme
         currentDate = date
     });
     messages_container.appendChild(messages)
+    let bottom = document.createElement("div")
+    bottom.id = "bottom"
+    messages_container.appendChild(bottom)
 
-    setTimeout(() => {
-        const scrollHeight = messages.scrollHeight
-        messages.scrollTo(0, scrollHeight)
-    }, 200);
-    
+    resolve()
+
+    }).then(
+        () => { 
+            const scrollHeight = messages.scrollHeight
+            messages.scrollTo(0, scrollHeight) 
+        }
+    )
 }
 
 function createDateHeader(date: string) {

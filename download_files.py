@@ -5,9 +5,11 @@ import string
 import json
 import shutil
 
+
 def download_file(url, download_dir="."):
 
-    file_dir = os.path.join(download_dir.replace('/', '\\'), ''.join(random.choices(string.ascii_letters + string.digits, k=16)))
+    file_dir = os.path.join(download_dir.replace(
+        '/', '\\'), ''.join(random.choices(string.ascii_letters + string.digits, k=16)))
 
     try:
         # Create the download directory if it doesn't exist
@@ -22,7 +24,8 @@ def download_file(url, download_dir="."):
             filename = content_disposition.split('filename=')[1].strip('";')
         else:
             # If the filename is not available in the header, generate a random filename
-            random_chars = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            random_chars = ''.join(random.choices(
+                string.ascii_letters + string.digits, k=8))
             filename = f"file_{random_chars}"
 
         # Get the file extension from the URL (if available)
@@ -50,40 +53,47 @@ def download_file(url, download_dir="."):
             raise FileNotFoundError
     except requests.exceptions.RequestException as e:
         print(f"Error downloading the file: {e}")
-        raise FileNotFoundError
-    
-if os.path.exists("static/downloads"):
-  shutil.rmtree("static/downloads")
+        raise FileNotFoundError from e
 
 
-with open('data.json', 'r') as file:
-    data = json.load(file)
+def main():
+    if os.path.exists("static/downloads"):
+        shutil.rmtree("static/downloads")
 
-for key in data:
-    messages = data[key]
+    with open('data.json', 'r', encoding='UTF-8') as file:
+        data = json.load(file)
 
-    for message in messages:
-        link = message['attached_file']
-        if link != '':
-            try:
-                save_path, mime_type = download_file(link, 'static/downloads')
-                message['storage_path'] = save_path
-                message['has_attachment'] = True
-                message['mime_type'] = mime_type
-                print(f'Saved file at {save_path}')
-            except:
+    for key in data:
+        messages = data[key]
+
+        for message in messages:
+            link = message['attached_file']
+            if link != '':
+                try:
+                    save_path, mime_type = download_file(
+                        link, 'static/downloads')
+                    message['storage_path'] = save_path
+                    message['has_attachment'] = True
+                    message['mime_type'] = mime_type
+                    print(f'Saved file at {save_path}')
+                except Exception:
+                    save_path = ''
+                    message['storage_path'] = save_path
+                    message['has_attachment'] = False
+                    message['mime_type'] = ''
+
+            else:
                 save_path = ''
                 message['storage_path'] = save_path
                 message['has_attachment'] = False
                 message['mime_type'] = ''
 
-        else:
-            save_path = ''
-            message['storage_path'] = save_path
-            message['has_attachment'] = False
-            message['mime_type'] = ''
+    with open('static/data_with_files_v2.json', 'w', encoding='UTF-8') as file:
+        json.dump(data, file, indent=4)
 
-with open('static/data_with_files_v2.json', 'w') as file:
-    json.dump(data, file, indent=4)
+    print('Done!')
 
-print('Done!')
+
+if __name__ == "__main__":
+    # main()
+    pass
