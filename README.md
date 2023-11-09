@@ -1,6 +1,6 @@
 # An archiver tool for our Webuntis messenger chats before the servers get taken down
 
-I have archived this repo, since the messenger no longer exists and the viewer is pretty much in its final state, so there is no need to maintain this project :).
+## I have archived this repo, since the messenger no longer exists and the viewer is pretty much in its final state, so there is no need to maintain this project :).
 
 To archive chats, install the requirements by running 'pip install -r requirements.txt', then run main.py.  
 If you also want to archive files, run download_files.py after running main.py.
